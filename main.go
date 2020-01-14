@@ -1,39 +1,53 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/url"
+	"strings"
+
 	"github.com/gocolly/colly"
 )
 
 type Item struct {
-	ItemName     string
-	ItemDesc     string
-	ItemPrice    float64
-	ShippingCost float64
-	ItemCond     string
+	ItemName     string  `json:"name"`
+	ItemDesc     string  `json:"description"`
+	ItemPrice    float64 `json:"price"`
+	ShippingCost float64 `json:"priceCurrency"`
+	ItemCond     string  `json:"itemCondition"`
 }
 
 func main() {
-	
+
 }
 
-func fetch_all_items(searchTerm string){
+func fetch_all_items(searchTerm string) {
 	c := colly.NewCollector(
 		colly.AllowedDomains("mercari.com"),
 		colly.Async(true),
 	)
 
-	c.OnHTML("div.Flex-ych44r-0 Space-cutht5-0 Container-sc-9aa7mx-0 Grid2__CellWrapper-mpt2p4-1 fKtviO", func(e *colly.HTMLElement) {
-		e.ForEach("div.Flex__Box-ych44r-1 Grid2__Col-mpt2p4-0 kXKTPb",  func(_ int, e *colly.HTMLElement) {
-			i := Item{}
-			i.ItemName = e.ChildText("a.Text__LinkText-sc-1e98qiv-0-a Link__StyledAnchor-dkjuk2-0 htCDzf Link__StyledPlainLink-dkjuk2-2 hykQP")
-			fmt.Printf("Product Name: %s", i.ItemName)
+	c.OnHTML("div.Flex-ych44r-0.Space-cutht5-0.Container-sc-9aa7mx-0.hepKGV", func(e *colly.HTMLElement) {
+		e.ForEach("div.Flex-ych44r-0.Space-cutht5-0.Container-sc-9aa7mx-0.withMetaInfo__FullContainer-sc-1j2k5ln-0.hyLExl > script:first-of-type", func(_ int, e *colly.HTMLElement) {
+			dat := e.Text
+
+			jsonData := dat[strings.Index(dat, "{") : len(dat)-1]
+			i := &Item{}
+			err := json.Unmarshal([]byte(jsonData), i)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			name := i.ItemName
+
+			fmt.Printf("Product Name: %s", name)
 		})
 	})
-	test := "Nike"
-	test1 := urlBuilderQuery(test).String()
-	c.Visit(test1)
+
+	//test := "Nike"
+	//test1 := urlBuilderQuery(test).String()
+	c.Visit("https://mercari.com/search/?keyword=lego")
 
 }
 
