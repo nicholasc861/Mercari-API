@@ -11,11 +11,30 @@ import (
 )
 
 type Item struct {
-	ItemName     string `json:"name"`
-	ItemDesc     string `json:"description"`
-	ItemPrice    string `json:"price"`
-	ShippingCost string `json:"priceCurrency"`
-	ItemCond     string `json:"itemCondition"`
+	Context  string
+	ItemType string
+	ItemName string
+	ItemPic  string
+	ItemDesc string
+
+	brand struct {
+		BrandType string
+		BrandName string
+	}
+
+	Offers struct {
+		OfferType string
+		OfferURL  string
+		Currency  string
+		Price     string
+		ItemCond  string
+		ItemAva   string
+
+		Seller struct {
+			SellerType string
+			SellerName string
+		}
+	}
 }
 
 func main() {
@@ -23,8 +42,9 @@ func main() {
 }
 
 func fetch_all_items() {
-	c := colly.NewCollector()
+	c := colly.NewCollector(
 	//colly.Async(true),
+	)
 
 	c.OnHTML("div.Flex-ych44r-0.Space-cutht5-0.Container-sc-9aa7mx-0.hepKGV", func(e *colly.HTMLElement) {
 		e.ForEach("div.Flex-ych44r-0.Space-cutht5-0.Container-sc-9aa7mx-0.withMetaInfo__FullContainer-sc-1j2k5ln-0.hyLExl", func(_ int, e *colly.HTMLElement) {
@@ -38,7 +58,7 @@ func fetch_all_items() {
 				log.Fatal(err)
 			}
 
-			name := i.ItemName
+			name := i.ItemDesc
 
 			fmt.Printf("Product Name: %s \n", name)
 		})
@@ -47,6 +67,7 @@ func fetch_all_items() {
 	//test := "Nike"
 	//test1 := urlBuilderQuery(test).String()
 	c.Visit("https://www.mercari.com/search/")
+
 }
 
 func urlBuilderQuery(searchTerm string) *url.URL {
