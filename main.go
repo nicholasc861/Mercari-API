@@ -6,8 +6,8 @@ import (
 	"log"
 	"net/url"
 	"strings"
-
 	"github.com/gocolly/colly"
+	"github.com/gorilla/mux"
 )
 
 type Item struct {
