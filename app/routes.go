@@ -1,4 +1,4 @@
-package main
+package routes
 
 import (
 	"net/http"
@@ -33,5 +33,11 @@ var routes = Routes{
 		"GET",
 		"/",
 		Index,
+	},
+	Route {
+		"GetProductsByKeyword",
+		"GET",
+		"/products/{keyword}",
+		GetProductsByKeyword,
 	},
 }

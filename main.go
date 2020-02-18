@@ -1,4 +1,4 @@
-package main
+package routes
 
 import (
 	"encoding/json"
@@ -8,37 +8,14 @@ import (
 	"strings"
 	"github.com/gocolly/colly"
 	"github.com/gorilla/mux"
+
 )
-
-type Item struct {
-	Context  string
-	ItemType string
-	ItemName string
-	ItemPic  string
-	ItemDesc string
-
-	brand struct {
-		BrandType string
-		BrandName string
-	}
-
-	Offers struct {
-		OfferType string
-		OfferURL  string
-		Currency  string
-		Price     string
-		ItemCond  string
-		ItemAva   string
-
-		Seller struct {
-			SellerType string
-			SellerName string
-		}
-	}
-}
 
 func main() {
 	fetch_all_items()
+	router := NewRouter()
+	log.Fatal(http.ListenAndServe(":8080", router))
+
 }
 
 func fetch_all_items() {
