@@ -37,13 +37,14 @@ type Item struct {
 
 // GET /
 func Index(res http.ResponseWriter, req *http.Request) {
-	fmt.Fprintln(res, "Welcome to Unofficial MercariAPI! For documentation, please consult [PLACEHOLDER]")
+	fmt.Fprintln(res, "Welcome to the Unofficial MercariAPI! For documentation, please consult [PLACEHOLDER]")
 }
 
 // GET /products/{keyword}
 func GetProductsByKeyword(res http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	keyword := vars["keyword"]
+	items := []Item{}
 	
 	c := colly.NewCollector(
 		colly.Async(true),
@@ -52,15 +53,15 @@ func GetProductsByKeyword(res http.ResponseWriter, req *http.Request) {
 	c.OnHTML("div.Flex-ych44r-0.Space-cutht5-0.Container-sc-9aa7mx-0.hepKGV", func(e *colly.HTMLElement) {
 		e.ForEach("div.Flex-ych44r-0.Space-cutht5-0.Container-sc-9aa7mx-0.withMetaInfo__FullContainer-sc-1j2k5ln-0.hyLExl", func(_ int, e *colly.HTMLElement) {
 			data := e.ChildText("script")
-
 			jsonData := data[strings.Index(data,"{"):len(data)]
-			i := &Item{}
+			i := Item{}
 			err := json.Unmarshal([]byte(jsonData), i)
 			if err != nil {
 				log.Fatal(err)
 			}
 
-			
+			a := append(items, i)
+
 		})
 	})
 
