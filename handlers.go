@@ -1,4 +1,4 @@
-package routes
+package main
 
 import (
 	"encoding/json"
@@ -7,33 +7,30 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-
+	"github.com/gorilla/mux"
 	"github.com/gocolly/colly"
 )
 
 type Item struct {
-	Context  string
-	ItemType string
-	ItemName string
-	ItemPic  string
-	ItemDesc string
-
+	Context  string `json:"@context"`
+	ItemType string	`json:"@type"`
+	ItemName string `json:"name"`
+	ItemPic  string	`json:"image"`
+	ItemDesc string	`json:"description"`
 	brand struct {
-		BrandType string
-		BrandName string
+		BrandType string `json:"@type"`
+		BrandName string `json:"name"`
 	}
-
 	Offers struct {
-		OfferType string
-		OfferURL  string
-		Currency  string
-		Price     string
-		ItemCond  string
-		ItemAva   string
-
+		OfferType string `json:"@type"`
+		OfferURL  string `json:"url"`
+		Currency  string `json:"priceCurrency"`
+		Price     string `json:"price"`
+		ItemCond  string `json:"itemCondition"`
+		ItemAva   string `json:"availability"`
 		Seller struct {
-			SellerType string
-			SellerName string
+			SellerType string `json:"@type"`
+			SellerName string `json:"name"`
 		}
 	}
 }
@@ -45,7 +42,31 @@ func Index(res http.ResponseWriter, req *http.Request) {
 
 // GET /products/{keyword}
 func GetProductsByKeyword(res http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	keyword := vars["keyword"]
+	
+	c := colly.NewCollector(
+		colly.Async(true),
+	)
 
+	c.OnHTML("div.Flex-ych44r-0.Space-cutht5-0.Container-sc-9aa7mx-0.hepKGV", func(e *colly.HTMLElement) {
+		e.ForEach("div.Flex-ych44r-0.Space-cutht5-0.Container-sc-9aa7mx-0.withMetaInfo__FullContainer-sc-1j2k5ln-0.hyLExl", func(_ int, e *colly.HTMLElement) {
+			data := e.ChildText("script")
+
+			jsonData := data[strings.Index(data,"{"):len(data)]
+			i := &Item{}
+			err := json.Unmarshal([]byte(jsonData), i)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			
+		})
+	})
+
+
+	url := urlBuilderQuery(keyword)
+	c.Visit(url)	
 }
 
 // GET /product/{id}
@@ -53,36 +74,7 @@ func GetProductById(res http.ResponseWriter, req *http.Request) {
 
 }
 
-func fetch_all_items() {
-	c := colly.NewCollector(
-	//colly.Async(true),
-	)
-
-	c.OnHTML("div.Flex-ych44r-0.Space-cutht5-0.Container-sc-9aa7mx-0.hepKGV", func(e *colly.HTMLElement) {
-		e.ForEach("div.Flex-ych44r-0.Space-cutht5-0.Container-sc-9aa7mx-0.withMetaInfo__FullContainer-sc-1j2k5ln-0.hyLExl", func(_ int, e *colly.HTMLElement) {
-			dat := e.ChildText("script")
-
-			jsonData := dat[strings.Index(dat, "{"):len(dat)]
-			i := &Item{}
-			err := json.Unmarshal([]byte(jsonData), i)
-
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			name := i.ItemDesc
-
-			fmt.Printf("Product Name: %s \n", name)
-		})
-	})
-
-	//test := "Nike"
-	//test1 := urlBuilderQuery(test).String()
-	c.Visit("https://www.mercari.com/search/")
-
-}
-
-func urlBuilderQuery(searchTerm string) *url.URL {
+func urlBuilderQuery(searchTerm string) string {
 	baseUrl, err := url.Parse("https://www.mercari.com/search/")
 	if err != nil {
 		fmt.Println("Malformed URL: ", err.Error())
@@ -91,6 +83,6 @@ func urlBuilderQuery(searchTerm string) *url.URL {
 	q := baseUrl.Query()
 	q.Set("keyword", searchTerm)
 	baseUrl.RawQuery = q.Encode()
-
-	return baseUrl
+	urlAsString := baseUrl.String()
+	return urlAsString
 }
