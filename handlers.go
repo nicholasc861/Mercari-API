@@ -7,17 +7,18 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"github.com/gorilla/mux"
+
 	"github.com/gocolly/colly"
+	"github.com/gorilla/mux"
 )
 
 type Item struct {
 	Context  string `json:"@context"`
-	ItemType string	`json:"@type"`
+	ItemType string `json:"@type"`
 	ItemName string `json:"name"`
-	ItemPic  string	`json:"image"`
-	ItemDesc string	`json:"description"`
-	brand struct {
+	ItemPic  string `json:"image"`
+	ItemDesc string `json:"description"`
+	brand    struct {
 		BrandType string `json:"@type"`
 		BrandName string `json:"name"`
 	}
@@ -28,7 +29,7 @@ type Item struct {
 		Price     string `json:"price"`
 		ItemCond  string `json:"itemCondition"`
 		ItemAva   string `json:"availability"`
-		Seller struct {
+		Seller    struct {
 			SellerType string `json:"@type"`
 			SellerName string `json:"name"`
 		}
@@ -45,7 +46,7 @@ func GetProductsByKeyword(res http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	keyword := vars["keyword"]
 	items := []Item{}
-	
+
 	c := colly.NewCollector(
 		colly.Async(true),
 	)
@@ -53,25 +54,28 @@ func GetProductsByKeyword(res http.ResponseWriter, req *http.Request) {
 	c.OnHTML("div.Flex-ych44r-0.Space-cutht5-0.Container-sc-9aa7mx-0.hepKGV", func(e *colly.HTMLElement) {
 		e.ForEach("div.Flex-ych44r-0.Space-cutht5-0.Container-sc-9aa7mx-0.withMetaInfo__FullContainer-sc-1j2k5ln-0.hyLExl", func(_ int, e *colly.HTMLElement) {
 			data := e.ChildText("script")
-			jsonData := data[strings.Index(data,"{"):len(data)]
-			i := Item{}
+			jsonData := data[strings.Index(data, "{"):len(data)]
+			i := &Item{}
 			err := json.Unmarshal([]byte(jsonData), i)
+
 			if err != nil {
 				log.Fatal(err)
 			}
-
-			a := append(items, i)
-
+			a := append(items, *i)
+			fmt.Println(a)
 		})
 	})
 
-
 	url := urlBuilderQuery(keyword)
-	c.Visit(url)	
+	c.Visit("https://mercari.com/search/?keyword=Nike")
 }
 
 // GET /product/{id}
 func GetProductById(res http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	keyword := vars["id"]
+
+	item := &Item{}
 
 }
 
