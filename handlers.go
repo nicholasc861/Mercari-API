@@ -47,35 +47,32 @@ func GetProductsByKeyword(res http.ResponseWriter, req *http.Request) {
 	keyword := vars["keyword"]
 	items := []Item{}
 
-	c := colly.NewCollector(
-		colly.Async(true),
-	)
+	c := colly.NewCollector()
 
-	c.OnHTML("div.Flex-ych44r-0.Space-cutht5-0.Container-sc-9aa7mx-0.hepKGV", func(e *colly.HTMLElement) {
-		e.ForEach("div.Flex-ych44r-0.Space-cutht5-0.Container-sc-9aa7mx-0.withMetaInfo__FullContainer-sc-1j2k5ln-0.hyLExl", func(_ int, e *colly.HTMLElement) {
-			data := e.ChildText("script")
-			jsonData := data[strings.Index(data, "{"):len(data)]
-			i := &Item{}
-			err := json.Unmarshal([]byte(jsonData), i)
+	c.OnHTML(".kXmgUV", func(e *colly.HTMLElement) {
+		data := e.ChildText("script")
+		jsonData := data[strings.Index(data, "{"):len(data)]
+		i := &Item{}
+		
+		err := json.Unmarshal([]byte(jsonData), i)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-			if err != nil {
-				log.Fatal(err)
-			}
-			a := append(items, *i)
-			fmt.Println(a)
-		})
+		a := append(items, *i)
+		fmt.Println(a)	
 	})
 
 	url := urlBuilderQuery(keyword)
-	c.Visit("https://mercari.com/search/?keyword=Nike")
+	c.Visit(url)
 }
 
 // GET /product/{id}
 func GetProductById(res http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-	keyword := vars["id"]
+	//vars := mux.Vars(req)
+	//keyword := vars["id"]
 
-	item := &Item{}
+	//item := &Item{}
 
 }
 
