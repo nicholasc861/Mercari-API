@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-
 	"github.com/gocolly/colly"
 	"github.com/gorilla/mux"
 )
@@ -52,15 +51,14 @@ func GetProductsByKeyword(res http.ResponseWriter, req *http.Request) {
 	c.OnHTML(".kXmgUV", func(e *colly.HTMLElement) {
 		data := e.ChildText("script")
 		jsonData := data[strings.Index(data, "{"):len(data)]
-		i := &Item{}
+		tempItem := &Item{}
 		
-		err := json.Unmarshal([]byte(jsonData), i)
+		err := json.Unmarshal([]byte(jsonData), tempItem)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		a := append(items, *i)
-		fmt.Println(a)	
+		items = append(items, *tempItem)
 	})
 
 	url := urlBuilderQuery(keyword)
@@ -69,11 +67,18 @@ func GetProductsByKeyword(res http.ResponseWriter, req *http.Request) {
 
 // GET /product/{id}
 func GetProductById(res http.ResponseWriter, req *http.Request) {
-	//vars := mux.Vars(req)
-	//keyword := vars["id"]
+	vars := mux.Vars(req)
+	id := vars["id"]
+	c := colly.NewCollector()
 
-	//item := &Item{}
+	c.OnHTML(".kVrcCF", func(e *colly.HTMLElement) {
+		tempItem := &Item{}
+		tempItem.ItemName = e.ChildText("")
+		
 
+	})
+
+	c.Visit("https://www.mercari.com/us/item/" + id)
 }
 
 func urlBuilderQuery(searchTerm string) string {
