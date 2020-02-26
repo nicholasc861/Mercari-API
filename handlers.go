@@ -5,35 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"strings"
 	"github.com/gocolly/colly"
 	"github.com/gorilla/mux"
 )
-
-type Item struct {
-	Context  string `json:"@context"`
-	ItemType string `json:"@type"`
-	ItemName string `json:"name"`
-	ItemPic  string `json:"image"`
-	ItemDesc string `json:"description"`
-	brand    struct {
-		BrandType string `json:"@type"`
-		BrandName string `json:"name"`
-	}
-	Offers struct {
-		OfferType string `json:"@type"`
-		OfferURL  string `json:"url"`
-		Currency  string `json:"priceCurrency"`
-		Price     string `json:"price"`
-		ItemCond  string `json:"itemCondition"`
-		ItemAva   string `json:"availability"`
-		Seller    struct {
-			SellerType string `json:"@type"`
-			SellerName string `json:"name"`
-		}
-	}
-}
 
 // GET /
 func Index(res http.ResponseWriter, req *http.Request) {
@@ -61,7 +36,7 @@ func GetProductsByKeyword(res http.ResponseWriter, req *http.Request) {
 		items = append(items, *tempItem)
 	})
 
-	url := urlBuilderQuery(keyword)
+	url := UrlBuilderQuery(keyword)
 	c.Visit(url)
 }
 
@@ -75,21 +50,26 @@ func GetProductById(res http.ResponseWriter, req *http.Request) {
 		tempItem := &Item{}
 		tempItem.ItemName = e.ChildText("")
 		
-
 	})
 
 	c.Visit("https://www.mercari.com/us/item/" + id)
 }
 
-func urlBuilderQuery(searchTerm string) string {
-	baseUrl, err := url.Parse("https://www.mercari.com/search/")
-	if err != nil {
-		fmt.Println("Malformed URL: ", err.Error())
-	}
+// GET /user/{id}
+func GetUserById(res http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	id := vars["id"]
+	c := colly.NewCollector()
 
-	q := baseUrl.Query()
-	q.Set("keyword", searchTerm)
-	baseUrl.RawQuery = q.Encode()
-	urlAsString := baseUrl.String()
-	return urlAsString
+	c.OnHTML(".hMDyjy", func(e *colly.HTMLElement) {
+		tempUser := &User{}
+		tempUser.Name = e.ChildText("")
+		tempUser.ItemsListed = e.ChildText("")
+		tempUser.Reviews = e.ChildText("")
+		tempUser.Sales = e.ChildText("")
+
+	})
+
+
+	c.Visit("https://www.mercari.com/u/" + id)
 }
