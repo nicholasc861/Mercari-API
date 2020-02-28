@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	router := NewRouter()
+	router := app.NewRouter()
 	log.Fatal(http.ListenAndServe(":8080", router))
 
 }
