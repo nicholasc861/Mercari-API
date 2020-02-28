@@ -21,9 +21,9 @@ go build
 ├── app
 │   ├── app.go
 │   └── handler          // Our API core handlers
-│       ├── handler.go    // Common response functions
-│       ├── helper.go  // APIs for Project model
-│       └── types.go     // APIs for Task model
+│       ├── handler.go   // Response functions
+│       ├── helper.go    // Helpers functions for handlers
+│       └── types.go     // Type structures
 └── main.go
 ```
 
