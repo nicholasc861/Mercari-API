@@ -17,3 +17,5 @@ func UrlBuilderQuery(searchTerm string) string {
 	urlAsString := baseUrl.String()
 	return urlAsString
 }
+
+

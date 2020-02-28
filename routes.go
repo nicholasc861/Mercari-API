@@ -40,4 +40,16 @@ var routes = Routes{
 		"/products/{keyword}",
 		GetProductsByKeyword,
 	},
+	Route {
+		"GetProductById",
+		"GET",
+		"/product/{id}",
+		GetProductById,
+	},
+	Route {
+		"GetUserById",
+		"GET",
+		"/user/{id}",
+		GetUserById,
+	},
 }
