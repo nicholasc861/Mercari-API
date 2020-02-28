@@ -33,24 +33,24 @@ var routes = Routes{
 		"Index",
 		"GET",
 		"/",
-		Index,
+		handler.Index,
 	},
 	Route {
 		"GetProductsByKeyword",
 		"GET",
 		"/products/{keyword}",
-		GetProductsByKeyword,
+		handler.GetProductsByKeyword,
 	},
 	Route {
 		"GetProductById",
 		"GET",
 		"/product/{id}",
-		GetProductById,
+		handler.GetProductById,
 	},
 	Route {
 		"GetUserById",
 		"GET",
 		"/user/{id}",
-		GetUserById,
+		handler.GetUserById,
 	},
 }
