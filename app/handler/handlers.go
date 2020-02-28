@@ -1,4 +1,4 @@
-package main
+package handler
 
 import (
 	"encoding/json"
@@ -91,4 +91,5 @@ func GetUserById(res http.ResponseWriter, req *http.Request) {
 	if err := json.NewEncoder(res).Encode(tempUser); err != nil {
 		panic(err)
 	}
+
 }

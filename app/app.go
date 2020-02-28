@@ -1,8 +1,9 @@
-package main
+package app
 
 import (
 	"net/http"
 	"github.com/gorilla/mux"
+	"github.com/nicholasc861/mercari-api/app/handler"
 )
 
 type Route struct {

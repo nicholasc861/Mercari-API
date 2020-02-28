@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"github.com/nicholasc861/mercari-api/app"
 )
 
 func main() {
